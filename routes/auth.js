@@ -7,15 +7,21 @@ const {
   loginValidation,
 } = require("../models/validation.model");
 
-router.posts("/register", async (req, res) => {
+router.post("/register", async (req, res) => {
   // Validate first
   const { error } = registerValidation(req.body);
 
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) {
+    console.log("Something went wrong");
+    return res.status(400).send(error.details[0].message);
+  }
 
   // Checking if user is already in the database
   const emailExist = await Restaurant.findOne({ email: req.body.email });
-  if (emailExist) return res.status(400).send("Email already exists");
+  if (emailExist) {
+    console.log("Email exists");
+    return res.status(400).send("Email already exists");
+  }
 
   // Hash the password
   const salt = await bcrypt.genSalt(10);
@@ -33,12 +39,12 @@ router.posts("/register", async (req, res) => {
     license,
     password,
   });
-
+  console.log(newRestaurant);
   try {
-    const savedRestaurant = await newRestaurant
-      .save()
-      .then(() => res.send(savedRestaurant));
+    const savedRestaurant = await newRestaurant.save();
+    res.send(savedRestaurant);
   } catch (error) {
+    console.log("Could not return");
     res.status(400).send("Error: " + error);
   }
 });

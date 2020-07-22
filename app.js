@@ -17,8 +17,8 @@ app.use(cors());
 app.use(express.json());
 
 // // ROUTES
-app.use('/restaurants', restaurantsRouter);
-app.user('/restaurant', authRoute);
+// app.use('/restaurants', restaurantsRouter);
+app.use('/restaurants', authRoute);
 
 const uri = process.env.DB_URI;
 mongoose.connect(uri, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});

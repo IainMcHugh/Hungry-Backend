@@ -9,7 +9,7 @@ const restaurantSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      minlength: 3,
+      minlength: 6,
     },
     owner: {
       type: String,
@@ -23,14 +23,14 @@ const restaurantSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      minlength: 3,
+      minlength: 6,
     },
     license: {
       type: String,
       required: true,
       unique: true,
       trim: true,
-      minlength: 3,
+      minlength: 6,
     },
     password: {
       type: String,
