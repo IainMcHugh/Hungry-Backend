@@ -4,14 +4,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require('cors');
 
-const menusRouter = require('./routes/menus');
-const usersRouter = require('./routes/users');
+const authRoute = require('./routes/auth');
 const restaurantsRouter = require('./routes/restaurants');
 
 require('dotenv').config();
-
-// const url = 'mongodb://localhost:27017';
-// const dbName = 'test2';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -21,8 +17,8 @@ app.use(cors());
 app.use(express.json());
 
 // // ROUTES
-app.use('/users', usersRouter);
-app.use('/menus', menusRouter);
+app.use('/restaurants', restaurantsRouter);
+app.user('/restaurant', authRoute);
 
 const uri = process.env.DB_URI;
 mongoose.connect(uri, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
