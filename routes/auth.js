@@ -17,8 +17,8 @@ router.post("/register", async (req, res) => {
   }
 
   // Checking if user is already in the database
-  const emailExist = await Restaurant.findOne({ email: req.body.email });
-  if (emailExist) {
+  const user = await Restaurant.findOne({ email: req.body.email });
+  if (user) {
     console.log("Email exists");
     return res.status(400).send("Email already exists");
   }
@@ -42,7 +42,9 @@ router.post("/register", async (req, res) => {
   console.log(newRestaurant);
   try {
     const savedRestaurant = await newRestaurant.save();
-    res.send(savedRestaurant);
+    const token = jwt.sign({_id: savedRestaurant._id}, process.env.TOKEN_SECRET);
+    console.log(token);
+    res.header('auth-token', token).send(token);
   } catch (error) {
     console.log("Could not return");
     res.status(400).send("Error: " + error);
@@ -58,7 +60,7 @@ router.post("/login", async (req, res) => {
 
   // Checking if email exists
   const user = await Restaurant.findOne({ email: req.body.email });
-  if (!user) return res.status(400).send("Email does not exists");
+  if (!user) return res.status(400).send("Email does not exist");
 
   // Password 
     const validPwd = await bcrypt.compare(req.body.password, user.password);
