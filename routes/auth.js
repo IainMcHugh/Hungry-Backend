@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const Menu = require("../models/menu.model");
 const Restaurant = require("../models/restaurant.model");
 const {
   registerValidation,
@@ -23,6 +24,19 @@ router.post("/register", async (req, res) => {
     return res.status(400).send("Email already exists");
   }
 
+  // creating default menu for new user
+  const newMenu = new Menu({
+    restaurant: req.body.restaurant,
+    data: "No Menu created..",
+  });
+  try {
+    const savedMenu = await newMenu.save();
+    const menuId = await savedMenu._id;
+    console.log(`Saved Menu ID: ${menuId}`);
+  } catch (err) {
+    console.log(err);
+  }
+
   // Hash the password
   const salt = await bcrypt.genSalt(10);
   const hashPwd = await bcrypt.hash(req.body.password, salt);
@@ -38,17 +52,22 @@ router.post("/register", async (req, res) => {
     email,
     license,
     password,
+    menuId,
   });
   console.log(newRestaurant);
   try {
     const savedRestaurant = await newRestaurant.save();
-    const token = jwt.sign({_id: savedRestaurant._id}, process.env.TOKEN_SECRET);
-    console.log(token);
-    res.header('auth-token', token).send(token);
+    const token = jwt.sign(
+      { _id: savedRestaurant._id },
+      process.env.TOKEN_SECRET
+    );
+    console.log(`Token is: ${token}`);
+    res.header("Authorisation", token).send("Registered!");
   } catch (error) {
     console.log("Could not return");
     res.status(400).send("Error: " + error);
   }
+
 });
 
 // Login
@@ -62,17 +81,17 @@ router.post("/login", async (req, res) => {
   const user = await Restaurant.findOne({ email: req.body.email });
   if (!user) return res.status(400).send("Email does not exist");
 
-  // Password 
-    const validPwd = await bcrypt.compare(req.body.password, user.password);
-    if(!validPwd) return res.status(400).send("Invalid Password!");
+  // Password
+  const validPwd = await bcrypt.compare(req.body.password, user.password);
+  if (!validPwd) return res.status(400).send("Invalid Password!");
 
-    // Create and assign a token
-    const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
-    res.header('auth-token', token).send("Logged in!");
+  // Create and assign a token
+  const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+  res.header("Authorisation", token).send("Logged in!");
 });
 
 router.post("/logout", async (req, res) => {
-  res.send('Logged Out!');
-})
+  res.send("Logged Out!");
+});
 
 module.exports = router;

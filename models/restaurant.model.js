@@ -37,6 +37,9 @@ const restaurantSchema = new Schema(
       required: true,
       max: 1024,
       min: 6
+    },
+    menuId: {
+      type: String,
     }
   },
   { timestamps: true }

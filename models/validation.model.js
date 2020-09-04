@@ -1,6 +1,7 @@
 // Validation
 const Joi = require("@hapi/joi");
 
+// These Schemas are purely for validating the form req from frontend
 
 // Register Validation
 const registerValidation = (data) => {
