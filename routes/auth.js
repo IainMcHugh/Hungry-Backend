@@ -7,6 +7,8 @@ const {
   registerValidation,
   loginValidation,
 } = require("../models/validation.model");
+const { func } = require("@hapi/joi");
+const e = require("express");
 
 router.post("/register", async (req, res) => {
   // Validate first
@@ -27,26 +29,60 @@ router.post("/register", async (req, res) => {
   // creating default menu for new user
   const newMenu = new Menu({
     restaurant: req.body.restaurant,
-    data: "No Menu created..",
+    starters: {
+      soup: {
+        description: "Hot tomato soup",
+        cost: "6.80",
+        allergens: [],
+        kcal: 302
+      }
+    }
   });
+
   try {
     const savedMenu = await newMenu.save();
     const menuId = await savedMenu._id;
     console.log(`Saved Menu ID: ${menuId}`);
+
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashPwd = await bcrypt.hash(req.body.password, salt);
+
+    const restaurant = req.body.restaurant;
+    const owner = req.body.owner;
+    const email = req.body.email;
+    const license = req.body.license;
+    const password = hashPwd;
+    const newRestaurant = await newUser(
+      restaurant,
+      owner,
+      email,
+      license,
+      password,
+      menuId
+    );
+    console.log(newRestaurant);
+    try {
+      console.log("try 1");
+      const savedRestaurant = await newRestaurant.save();
+      console.log("try 2");
+      const token = jwt.sign(
+        { _id: savedRestaurant._id },
+        process.env.TOKEN_SECRET
+      );
+      console.log(`Token is: ${token}`);
+      res.header("Authorisation", token).send("Registered!");
+    } catch (error) {
+      console.log("Could not return");
+      res.status(400).send("Error: " + error);
+    }
   } catch (err) {
     console.log(err);
   }
+});
 
-  // Hash the password
-  const salt = await bcrypt.genSalt(10);
-  const hashPwd = await bcrypt.hash(req.body.password, salt);
-
-  const restaurant = req.body.restaurant;
-  const owner = req.body.owner;
-  const email = req.body.email;
-  const license = req.body.license;
-  const password = hashPwd;
-  const newRestaurant = new Restaurant({
+async function newUser(restaurant, owner, email, license, password, menuId) {
+  return new Restaurant({
     restaurant,
     owner,
     email,
@@ -54,21 +90,7 @@ router.post("/register", async (req, res) => {
     password,
     menuId,
   });
-  console.log(newRestaurant);
-  try {
-    const savedRestaurant = await newRestaurant.save();
-    const token = jwt.sign(
-      { _id: savedRestaurant._id },
-      process.env.TOKEN_SECRET
-    );
-    console.log(`Token is: ${token}`);
-    res.header("Authorisation", token).send("Registered!");
-  } catch (error) {
-    console.log("Could not return");
-    res.status(400).send("Error: " + error);
-  }
-
-});
+}
 
 // Login
 router.post("/login", async (req, res) => {

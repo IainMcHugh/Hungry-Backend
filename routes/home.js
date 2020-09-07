@@ -1,17 +1,23 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
 
+const Restaurant = require("../models/restaurant.model");
 const Menu = require("../models/menu.model");
 
 router.post("/", (req, res) => {
   console.log(req.body.token);
   jwt.verify(req.body.token, process.env.TOKEN_SECRET, (err, decoded) => {
     if (err) console.log(err);
-    console.log("WE MADE IT!");
     console.log(decoded);
-    // check for restaurant menu
-    Menu.find().then((result) => {
-      res.send(result);
+    console.log(`Decoded ID: ${decoded._id}`);
+    Restaurant.findById(decoded._id, function(err, response) {
+      if(err) console.log(err);
+      console.log(response);
+      Menu.findById(response.menuId, function(err, result){
+        if(err) console.log(err);
+        console.log(result);
+        res.send(result);
+      })
     });
   });
 });
