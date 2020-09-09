@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const authRoute = require("./routes/auth");
-const homeRoute = require("./routes/home");
+const menuRoute = require("./routes/menu");
 // const restaurantsRouter = require("./routes/restaurants");
 
 require("dotenv").config();
@@ -25,7 +25,7 @@ app.use(express.json());
 // // ROUTES
 // app.use('/restaurants', restaurantsRouter);
 app.use("/restaurants", authRoute);
-app.use("/home", homeRoute);
+app.use("/menu", menuRoute);
 
 const uri = process.env.DB_URI;
 mongoose.connect(uri, {

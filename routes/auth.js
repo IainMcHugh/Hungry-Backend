@@ -74,6 +74,7 @@ router.post("/register", async (req, res) => {
       res.header("Authorisation", token).send("Registered!");
     } catch (error) {
       console.log("Could not return");
+      console.log(error);
       res.status(400).send("Error: " + error);
     }
   } catch (err) {
