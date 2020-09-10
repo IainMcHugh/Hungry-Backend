@@ -29,14 +29,15 @@ router.post("/register", async (req, res) => {
   // creating default menu for new user
   const newMenu = new Menu({
     restaurant: req.body.restaurant,
-    starters: {
-      soup: {
+    starters: [
+      {
+        name: "Soup",
         description: "Hot tomato soup",
         cost: "6.80",
         allergens: [],
-        kcal: 302
+        kcal: "302"
       }
-    }
+    ]
   });
 
   try {

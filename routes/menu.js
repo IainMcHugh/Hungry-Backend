@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
+var ObjectId = require('mongodb').ObjectID;
 
 const Restaurant = require("../models/restaurant.model");
 const Menu = require("../models/menu.model");
@@ -24,6 +25,13 @@ router.post("/", (req, res) => {
 
 router.post("/add", (req, res) => {
   console.log(req.body);
+  const item = req.body.item;
+  const newVal = {starters: item};
+  // const newVal = {starters: "mytest"};
+  Menu.updateOne({_id: new ObjectId(req.body.menuid)}, {$addToSet: newVal}, (err, result) => {
+    if(err) console.log(`>Error: ${err}`);
+    res.send(result);
+  })
 });
 
 module.exports = router;

@@ -6,10 +6,15 @@ const menuSchema = new Schema(
   {
     restaurant: { type: String, required: true },
     // data: { type: String, required: true },
-    starters: { type: Schema.Types.Mixed},
+    starters: [new Schema({
+      description: String,
+      cost: String,
+      allergens: [],
+      kcal: String,
+    }, {strict: false })],
     mains: { type: Schema.Types.Mixed },
     deserts: { type: Schema.Types.Mixed },
-    drinks: { type: Schema.Types.Mixed },
+    drinks: { type: Schema.Types.Mixed }, 
   },
   { timestamps: true }
 );
