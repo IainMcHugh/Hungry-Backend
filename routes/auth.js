@@ -35,9 +35,9 @@ router.post("/register", async (req, res) => {
         description: "Hot tomato soup",
         cost: "6.80",
         allergens: [],
-        kcal: "302"
-      }
-    ]
+        kcal: "302",
+      },
+    ],
   });
 
   try {
@@ -102,16 +102,18 @@ router.post("/login", async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   // Checking if email exists
-  const user = await Restaurant.findOne({ email: req.body.email });
-  if (!user) return res.status(400).send("Email does not exist");
+  try {
+    const user = await Restaurant.findOne({ email: req.body.email });
+    if (!user) return res.status(400).send("Email does not exist");
 
-  // Password
-  const validPwd = await bcrypt.compare(req.body.password, user.password);
-  if (!validPwd) return res.status(400).send("Invalid Password!");
+    // Password
+    const validPwd = await bcrypt.compare(req.body.password, user.password);
+    if (!validPwd) return res.status(400).send("Invalid Password!");
 
-  // Create and assign a token
-  const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-  res.header("Authorisation", token).send("Logged in!");
+    // Create and assign a token
+    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+    res.header("Authorisation", token).send("Logged in!");
+  } catch (error) {res.status(400).send(error)}
 });
 
 router.post("/logout", async (req, res) => {
