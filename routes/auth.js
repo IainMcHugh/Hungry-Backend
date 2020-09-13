@@ -99,16 +99,16 @@ router.post("/login", async (req, res) => {
   // Validate first
   const { error } = loginValidation(req.body);
 
-  if (error) return res.status(200).send(error.details[0].message);
+  if (error) return res.status(400).send(error.details[0].message);
 
   // Checking if email exists
   try {
     const user = await Restaurant.findOne({ email: req.body.email });
-    if (!user) return res.status(200).send("Email does not exist");
+    if (!user) return res.status(400).err("Email does not exist");
 
     // Password
     const validPwd = await bcrypt.compare(req.body.password, user.password);
-    if (!validPwd) return res.status(200).send("Invalid Password!");
+    if (!validPwd) return res.status(400).err("Invalid Password!");
 
     // Create and assign a token
     const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);

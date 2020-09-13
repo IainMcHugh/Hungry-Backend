@@ -39,4 +39,19 @@ router.post("/add", (req, res) => {
   );
 });
 
+router.post("/delete", (req, res) => {
+  const menuid = req.body.menuid;
+  const id = req.body.id;
+  console.log(id);
+
+  Menu.updateOne(
+    { _id: new ObjectId(menuid) },
+    { $pull: { starters: { _id: ObjectId(id) } } },
+    (err, result) => {
+      if (err) res.status(400).err(err);
+      res.status(200).send(result);
+    }
+  );
+});
+
 module.exports = router;
